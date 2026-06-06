@@ -82,7 +82,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('⏳ Получил файл, обрабатываю...')
 
     try:
-        # Скачиваем файл
+        # Скачиваем файл_1
         file = await context.bot.get_file(document.file_id)
         file_content = io.BytesIO()
         await file.download_to_memory(file_content)
