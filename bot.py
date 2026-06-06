@@ -99,7 +99,8 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         # Подготовка сигнала
-        Y_noisy_np = signal_noisy_numeric.values
+        Y_noisy_n = signal_noisy_numeric.values
+        Y_noisy_np= Y_noisy_n[0:20000]
         N = len(Y_noisy_np)
         
         # Частоты (0-4 ГГц)
@@ -132,38 +133,38 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
        
         await update.message.reply_text('Загружаю нейросеть и обрабатываю сигнал...')
         
-        # if not hasattr(handle_file, 'model'):
-        #     handle_file.model = load_model(MODEL_PATH, compile=False)
-        #     await update.message.reply_text('Модель загружена')
+        if not hasattr(handle_file, 'model'):
+            handle_file.model = load_model(MODEL_PATH, compile=False)
+            await update.message.reply_text('Модель загружена')
         
         
-        # Y_out = model_propos(Y_noisy_np, model=handle_file.model)
+        Y_out = model_propos(Y_noisy_np, model=handle_file.model)
         
        
-        # N_out = len(Y_out)
-        # freqs_out = np.linspace(0, 4 * 10**9, N_out)
-        # spectrum_out = np.abs(np.fft.fft(Y_out))
-        # spectrum_out_norm = spectrum_out / (np.max(spectrum_out[100:]) + 1e-20)
-        # log_spectrum_out_norm = np.log10(spectrum_out_norm + 1e-20)
+        N_out = len(Y_out)
+        freqs_out = np.linspace(0, 4 * 10**9, N_out)
+        spectrum_out = np.abs(np.fft.fft(Y_out))
+        spectrum_out_norm = spectrum_out / (np.max(spectrum_out[100:]) + 1e-20)
+        log_spectrum_out_norm = np.log10(spectrum_out_norm + 1e-20)
 
-        # # График 2: выходной сигнал
-        # plt.figure(figsize=(10, 5))
-        # freqs_out_mhz = freqs_out * 10**(-6)
-        # plt.plot(freqs_out_mhz[:N_out//2], log_spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
-        # plt.title(f'Спектр сигнала после нейросети', fontsize=12)
-        # plt.xlabel('Частота (МГц)', fontsize=12)
-        # plt.ylabel('log10(Амплитуда)', fontsize=10)
-        # plt.grid(True, alpha=0.3)
+        # График 2: выходной сигнал
+        plt.figure(figsize=(10, 5))
+        freqs_out_mhz = freqs_out * 10**(-6)
+        plt.plot(freqs_out_mhz[:N_out//2], log_spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
+        plt.title(f'Спектр сигнала после нейросети', fontsize=12)
+        plt.xlabel('Частота (МГц)', fontsize=12)
+        plt.ylabel('log10(Амплитуда)', fontsize=10)
+        plt.grid(True, alpha=0.3)
         
-        # img_stream2 = io.BytesIO()
-        # plt.savefig(img_stream2, format='png', dpi=100, bbox_inches='tight')
-        # img_stream2.seek(0)
-        # plt.close()
+        img_stream2 = io.BytesIO()
+        plt.savefig(img_stream2, format='png', dpi=100, bbox_inches='tight')
+        img_stream2.seek(0)
+        plt.close()
         
-        # await update.message.reply_photo(
-        #     photo=img_stream2,
-        #     caption=f'Выходной сигнал после нейросети\nДлина: {N_out} отсчётов\nДиапазон: 0 - 2 ГГц'
-        # )
+        await update.message.reply_photo(
+            photo=img_stream2,
+            caption=f'Выходной сигнал после нейросети\nДлина: {N_out} отсчётов\nДиапазон: 0 - 2 ГГц'
+        )
         
     except Exception as e:
         error_msg = str(e)
