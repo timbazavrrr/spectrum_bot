@@ -90,7 +90,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обработка данных
         df_noisy = pd.read_csv(file_content, sep=' ', usecols=[1], header=None)
-        signal_noisy_str = df_noisy.iloc[:, 0].astype(str)
+        signal_noisy_str = df_noisy.iloc[0:50000, 0].astype(str)
         signal_noisy_processed = signal_noisy_str.str.replace(',', '.')
         signal_noisy_numeric = pd.to_numeric(signal_noisy_processed, errors='coerce').dropna()
         
@@ -99,8 +99,8 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         # Подготовка сигнала
-        Y_noisy_n = signal_noisy_numeric.values
-        Y_noisy_np= Y_noisy_n[0:20000]
+        Y_noisy_np = signal_noisy_numeric.values
+        # Y_noisy_np= Y_noisy_n[0:20000]
         N = len(Y_noisy_np)
         
         # Частоты (0-4 ГГц)
