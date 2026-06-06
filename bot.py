@@ -55,7 +55,7 @@ def model_propos(Y_noisy_np,model):
   pred_windows = pred_signal_1.squeeze()
   step = 1300
   reconstructed_signal = overlap_add_windows(pred_windows, window_size=2000, step=step)
-  reconstructed_signal=reconstructed_signal[500:kray]
+  reconstructed_signal=reconstructed_signal[0:kray]
   pred_signal_fl_1_nm= (reconstructed_signal  - np.min(reconstructed_signal )) / (np.max(reconstructed_signal ) - np.min(reconstructed_signal ))
   return  pred_signal_fl_1_nm
 
