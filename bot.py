@@ -167,20 +167,22 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         try:
             # Читаем временную метку из первой колонки CSV
-            df_time = pd.read_csv(file_content, sep=' ', usecols=[0], header=None)
-            time_str = df_time.iloc[:, 0].astype(str)
-            time_clean = time_str.str.replace(',', '.')
-            time_numeric = pd.to_numeric(time_clean, errors='coerce')
+            N_out = len(Y_out)
+            df_noisy_time = pd.read_csv(file_content, sep=' ', usecols=[0], header=None)
+            time_noisy_str_1 = df_noisy_time.iloc[0:N_out,0].astype(str)
+            time_noisy_str_2 = time_noisy_str_1 .str.replace(',', '.')
+            time_noisy_str =time_noisy_str_2.str.rstrip('.')
+            time_noisy_numeric = pd.to_numeric(time_noisy_str, errors='coerce')
+            ORIGINAL_SIGNAL_LENGTH = len(time_noisy_numeric) - 1
+            TARGET_SIGNAL_LENGTH = len(time_noisy_numeric)
+            time_noisy_padded = np.pad(time_noisy_numeric.values,
+                                        (0, TARGET_SIGNAL_LENGTH - len(time_noisy_numeric)),
+                                        'constant', constant_values=0)
             
-            # Обрезаем или дополняем до длины выходного сигнала
-            if len(time_numeric) > len(Y_out):
-                time_aligned = time_numeric.iloc[:len(Y_out)].values
-            else:
-                time_aligned = np.pad(time_numeric.values, (0, len(Y_out) - len(time_numeric)), 'constant', constant_values=0)
-            
+
             # Создаём DataFrame
             df_export = pd.DataFrame({
-                'Время': time_aligned,
+                'Время': time_noisy_padded,
                 'Амплитуда': Y_out
             })
             
