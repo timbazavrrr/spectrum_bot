@@ -200,7 +200,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as csv_error:
     # Если CSV не создался, пишем в логи, но не прерываем работу
             print(f"Ошибка при создании CSV файла: {csv_error}")
-            await update.message.reply_text('⚠️ Не удалось создать CSV файл, но графики готовы.')
+            await update.message.reply_text('⚠️ Не удалось создать CSV фаел, но графики готовы.')
         
         # === КОНЕЦ НОВОГО КОДА ===
         
