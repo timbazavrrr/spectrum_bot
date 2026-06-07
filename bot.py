@@ -168,6 +168,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             # Читаем временную метку из первой колонки CSV
             N_out = len(Y_out)
+            file_content.seek(0) 
             df_noisy_time = pd.read_csv(file_content, sep=' ', usecols=[0], header=None)
             time_noisy_str_1 = df_noisy_time.iloc[0:N_out,0].astype(str)
             time_noisy_str_2 = time_noisy_str_1 .str.replace(',', '.')
