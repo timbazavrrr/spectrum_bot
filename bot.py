@@ -165,11 +165,51 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             photo=img_stream2,
             caption=f'Выходной сигнал после нейросети\nДлина: {N_out} отсчётов\nДиапазон: 0 - 2 ГГц'
         )
+        try:
+            # Читаем временную метку из первой колонки CSV
+            df_time = pd.read_csv(file_content, sep=' ', usecols=[0], header=None)
+            time_str = df_time.iloc[:, 0].astype(str)
+            time_clean = time_str.str.replace(',', '.')
+            time_numeric = pd.to_numeric(time_clean, errors='coerce')
+            
+            # Обрезаем или дополняем до длины выходного сигнала
+            if len(time_numeric) > len(Y_out):
+                time_aligned = time_numeric.iloc[:len(Y_out)].values
+            else:
+                time_aligned = np.pad(time_numeric.values, (0, len(Y_out) - len(time_numeric)), 'constant', constant_values=0)
+            
+            # Создаём DataFrame
+            df_export = pd.DataFrame({
+                'Время': time_aligned,
+                'Амплитуда': Y_out
+            })
+            
+            # Сохраняем в Excel в памяти (не на диск)
+            excel_stream = io.BytesIO()
+            with pd.ExcelWriter(excel_stream, engine='openpyxl') as writer:
+                df_export.to_excel(writer, index=False, sheet_name='Обработанный_сигнал')
+            excel_stream.seek(0)
+            
+            # Отправляем Excel файл
+            await update.message.reply_document(
+                document=excel_stream,
+                filename='Обработанный_Файл.xlsx',
+                caption='Файл с обработанным сигналом'
+            )
+  
+        except Exception as excel_error:
+            # Если Excel не создался, пишем в логи, но не прерываем работу
+            print(f"Ошибка при создании Excel: {excel_error}")
+            await update.message.reply_text('Не удалось создать Excel файл, но графики готовы.')
         
+        # === КОНЕЦ НОВОГО КОДА ===
+        
+    except Exception as e:
+        await update.message.reply_text(f' Ошибка: {str(e)}')
     except Exception as e:
         error_msg = str(e)
         print(f"Ошибка: {error_msg}")
-        await update.message.reply_text(f'❌ Ошибка: {error_msg[:200]}')
+        await update.message.reply_text(f' Ошибка: {error_msg[:200]}')
 
 if __name__ == '__main__':
     if not BOT_TOKEN:
