@@ -186,10 +186,13 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             clean_DataFrame_time=pd.DataFrame(data_time)
             clean_DataFrame_sig=pd.DataFrame(data_sig)
             clean_DataFrame=pd.concat([clean_DataFrame_time,clean_DataFrame_sig], axis=1)
-            doc_csv=clean_DataFrame.to_csv('Обработанный Файл.csv', index=False, encoding='utf-8-sig')
+            # Сохраняем в CSV в памяти (не на диск)
+            csv_stream = io.BytesIO()
+            clean_DataFrame.to_csv(csv_stream, index=False, encoding='utf-8-sig')
+            csv_stream.seek(0)  
             # Отправляем Excel файл
             await update.message.reply_document(
-                document=doc_csv,
+                 document=csv_stream,
                 filename='Обработанный_Файл.csv',
                 caption='Файл с обработанным сигналом'
             )
