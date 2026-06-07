@@ -178,31 +178,26 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             time_noisy_padded = np.pad(time_noisy_numeric.values,
                                         (0, TARGET_SIGNAL_LENGTH - len(time_noisy_numeric)),
                                         'constant', constant_values=0)
-            
-
+      
             # Создаём DataFrame
-            df_export = pd.DataFrame({
-                'Время': time_noisy_padded,
-                'Амплитуда': Y_out
-            })
-            
-            # Сохраняем в Excel в памяти (не на диск)
-            excel_stream = io.BytesIO()
-            with pd.ExcelWriter(excel_stream, engine='openpyxl') as writer:
-                df_export.to_excel(writer, index=False, sheet_name='Обработанный_сигнал')
-            excel_stream.seek(0)
-            
+            signal_clean=Y_out
+            data_time={'время':time_noisy_padded}
+            data_sig={'амплитуда':signal_clean}
+            clean_DataFrame_time=pd.DataFrame(data_time)
+            clean_DataFrame_sig=pd.DataFrame(data_sig)
+            clean_DataFrame=pd.concat([clean_DataFrame_time,clean_DataFrame_sig], axis=1)
+            doc_csv=clean_DataFrame.to_csv('Обработанный Файл.csv', index=False, encoding='utf-8-sig')
             # Отправляем Excel файл
             await update.message.reply_document(
-                document=excel_stream,
-                filename='Обработанный_Файл.xlsx',
+                document=doc_csv,
+                filename='Обработанный_Файл.csv',
                 caption='Файл с обработанным сигналом'
             )
   
-        except Exception as excel_error:
-            # Если Excel не создался, пишем в логи, но не прерываем работу
-            print(f"Ошибка при создании Excel: {excel_error}")
-            await update.message.reply_text('Не удалось создать Excel файл, но графики готовы.')
+        except Exception as csv_error:
+    # Если CSV не создался, пишем в логи, но не прерываем работу
+            print(f"Ошибка при создании CSV файла: {csv_error}")
+            await update.message.reply_text('⚠️ Не удалось создать CSV файл, но графики готовы.')
         
         # === КОНЕЦ НОВОГО КОДА ===
         
