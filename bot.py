@@ -135,10 +135,12 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # График 1: входной сигнал
         plt.figure(figsize=(10, 5))
         freqs_mhz = freqs * 10**(-6)
-        plt.plot(freqs_mhz[:N//2], log_spectrum_noisy_norm[:N//2], color='green', linewidth=0.8)
+        # plt.plot(freqs_mhz[:N//2], log_spectrum_noisy_norm[:N//2], color='green', linewidth=0.8)
+        plt.plot(freqs_mhz[:N//2], spectrum_noisy_norm[:N//2], color='green', linewidth=0.8)
         plt.title(f'Нормированный спектр входного сигнала - {document.file_name}', fontsize=12)
         plt.xlabel('Частота (МГц)', fontsize=12)
         plt.ylabel('log10(Амплитуда)', fontsize=10)
+        plt.ylim(0,1000)
         plt.grid(True, alpha=0.3)
         
         img_stream1 = io.BytesIO()
@@ -171,10 +173,12 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # График 2: выходной сигнал
         plt.figure(figsize=(10, 5))
         freqs_out_mhz = freqs_out * 10**(-6)
-        plt.plot(freqs_out_mhz[:N_out//2], log_spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
+        # plt.plot(freqs_out_mhz[:N_out//2], log_spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
+        plt.plot(freqs_out_mhz[:N_out//2], spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
         plt.title(f'Спектр сигнала после нейросети', fontsize=12)
         plt.xlabel('Частота (МГц)', fontsize=12)
         plt.ylabel('log10(Амплитуда)', fontsize=10)
+        plt.ylim(0,1000)
         plt.grid(True, alpha=0.3)
         
         img_stream2 = io.BytesIO()
