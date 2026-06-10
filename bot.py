@@ -140,7 +140,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         plt.title(f'Нормированный спектр входного сигнала - {document.file_name}', fontsize=12)
         plt.xlabel('Частота (МГц)', fontsize=12)
         plt.ylabel('log10(Амплитуда)', fontsize=10)
-        plt.ylim(0,1000)
+        plt.ylim(0,10)
         plt.grid(True, alpha=0.3)
         
         img_stream1 = io.BytesIO()
@@ -178,7 +178,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         plt.title(f'Спектр сигнала после нейросети', fontsize=12)
         plt.xlabel('Частота (МГц)', fontsize=12)
         plt.ylabel('log10(Амплитуда)', fontsize=10)
-        plt.ylim(0,1000)
+        plt.ylim(0,10)
         plt.grid(True, alpha=0.3)
         
         img_stream2 = io.BytesIO()
