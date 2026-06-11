@@ -13,21 +13,7 @@ from tensorflow.keras.models import load_model
 from flask import Flask, request
 import threading
 import asyncio
-from flask import Flask
-import threading
 
-flask_app = Flask(__name__)
-
-@flask_app.route('/health')
-def health():
-    return "OK", 200
-
-def run_health_server():
-    port = int(os.environ.get('PORT', 10000))
-    flask_app.run(host='0.0.0.0', port=port)
-
-# Запускаем в отдельном потоке
-threading.Thread(target=run_health_server, daemon=True).start()
 # Flask-сервер для healthcheck
 # flask_app = Flask(__name__)
 
@@ -149,12 +135,11 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # График 1: входной сигнал
         plt.figure(figsize=(10, 5))
         freqs_mhz = freqs * 10**(-6)
-        # plt.plot(freqs_mhz[:N//2], log_spectrum_noisy_norm[:N//2], color='green', linewidth=0.8)
-        plt.plot(freqs_mhz[:N//2], spectrum_noisy_norm[:N//2], color='green', linewidth=0.8)
+        plt.plot(freqs_mhz[:N//2], log_spectrum_noisy_norm[:N//2], color='green')
+        # plt.plot(freqs_mhz[:N//2], spectrum_noisy_norm[:N//2], color='green', linewidth=0.8)
         plt.title(f'Нормированный спектр входного сигнала - {document.file_name}', fontsize=12)
         plt.xlabel('Частота (МГц)', fontsize=12)
         plt.ylabel('log10(Амплитуда)', fontsize=10)
-        plt.ylim(0,0.2)
         plt.gca().yaxis.set_major_locator(plt.MaxNLocator(20))
         plt.grid(True)
         
@@ -189,11 +174,11 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         plt.figure(figsize=(10, 5))
         freqs_out_mhz = freqs_out * 10**(-6)
         # plt.plot(freqs_out_mhz[:N_out//2], log_spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
-        plt.plot(freqs_out_mhz[:N_out//2], spectrum_out_norm[:N_out//2], color='red', linewidth=0.8)
+        plt.plot(freqs_out_mhz[:N_out//2], log_spectrum_out_norm[:N_out//2], color='red')
         plt.title(f'Спектр сигнала после нейросети', fontsize=12)
         plt.xlabel('Частота (МГц)', fontsize=12)
         plt.ylabel('log10(Амплитуда)', fontsize=10)
-        plt.ylim(0,0.2)
+        # plt.ylim(0,0.2)
         plt.gca().yaxis.set_major_locator(plt.MaxNLocator(20))
         plt.grid(True)
         
@@ -252,7 +237,24 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         error_msg = str(e)
         print(f"Ошибка: {error_msg}")
         await update.message.reply_text(f' Ошибка: {error_msg[:200]}')
+import threading
+from flask import Flask
 
+# Создаем приложение Flask для healthcheck
+health_app = Flask(__name__)
+
+@health_app.route('/')
+@health_app.route('/health')
+def health_check():
+    return "OK", 200
+
+def run_health_server():
+    # Render сам назначает порт через переменную PORT
+    port = int(os.environ.get('PORT', 10000))
+    health_app.run(host='0.0.0.0', port=port)
+
+# Запускаем healthcheck-сервер в отдельном потоке, чтобы не блокировать основного бота
+threading.Thread(target=run_health_server, daemon=True).start()
 if __name__ == '__main__':
     if not BOT_TOKEN:
         print("ОШИБКА: Не задан TELEGRAM_TOKEN в переменных окружения")
