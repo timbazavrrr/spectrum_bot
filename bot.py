@@ -13,7 +13,21 @@ from tensorflow.keras.models import load_model
 from flask import Flask, request
 import threading
 import asyncio
+from flask import Flask
+import threading
 
+flask_app = Flask(__name__)
+
+@flask_app.route('/health')
+def health():
+    return "OK", 200
+
+def run_health_server():
+    port = int(os.environ.get('PORT', 10000))
+    flask_app.run(host='0.0.0.0', port=port)
+
+# Запускаем в отдельном потоке
+threading.Thread(target=run_health_server, daemon=True).start()
 # Flask-сервер для healthcheck
 # flask_app = Flask(__name__)
 
