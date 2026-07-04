@@ -14,22 +14,22 @@ from flask import Flask, request
 import threading
 import asyncio
 
-# Flask-сервер для healthcheck
-# flask_app = Flask(__name__)
+#Flask-сервер для healthcheck
+flask_app = Flask(__name__)
 
-# @flask_app.route('/health')
-# def health_check():
-#     # Эта функция будет отвечать на запросы от cron-job.org
-#     return "OK", 200
+@flask_app.route('/health')
+def health_check():
+    # Эта функция будет отвечать на запросы от cron-job.org
+    return "OK", 200
 
-# def run_flask():
-#     # Запускаем Flask-сервер на порту, который назначает Render
-#     port = int(os.environ.get('PORT', 10000))
-#     flask_app.run(host='0.0.0.0', port=port)
+def run_flask():
+    # Запускаем Flask-сервер на порту, который назначает Render
+    port = int(os.environ.get('PORT', 10000))
+    flask_app.run(host='0.0.0.0', port=port)
 
-# # Запускаем Flask в отдельном потоке, чтобы не блокировать работу бота
-# flask_thread = threading.Thread(target=run_flask)
-# flask_thread.start()
+# Запускаем Flask в отдельном потоке, чтобы не блокировать работу бота
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
 
 # ... ваш существующий код с app.run_polling()
 BOT_TOKEN = os.environ.get('TELEGRAM_TOKEN', '')
