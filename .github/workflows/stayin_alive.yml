@@ -1,16 +1,25 @@
-name: Keep Render Alive
+name: Keep Render Alive and Restart if Needed
 
 on:
   schedule:
-    # Запускать каждые 14 минут (интервал меньше 15 минут, чтобы Render не засыпал)
-    - cron: '*/14 * * * *'
+    - cron: '*/14 * * * *' # каждые 14 минут
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Render service
+      - name: Ping Render (try to wake up)
         run: |
-          echo "Pinging https://https://spectrum-bot-2wrk.onrender.com/health"
-          curl -s -o /dev/null -w "%{http_code}\n" https://ВАШ_БОТ.onrender.com/health
+          echo "Pinging health endpoint..."
+          # Пинг health endpoint, но игнорируем ошибку
+          curl -s -o /dev/null -w "%{http_code}\n" https://ВАШ_БОТ.onrender.com/health || true
+
+      - name: Force restart (if needed)
+        run: |
+          echo "Restarting service via Render API..."
+          # Команда для перезапуска сервиса через API
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RNDR_KEY }}" \
+            -H "Content-Type: application/json" \
+            https://api.render.com/v1/services/${{ secrets.ID_SERV_KEY }}/deploys
