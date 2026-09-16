@@ -100,7 +100,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text('Пожалуйста, отправь файл в формате CSV.')
         return
 
-    await update.message.reply_text('⏳ Получил файл, обрабатываю...')
+    await update.message.reply_text('Получил файл, обрабатываю...')
 
     try:
         # Скачиваем файл_1
@@ -116,7 +116,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         signal_noisy_numeric = pd.to_numeric(signal_noisy_processed, errors='coerce').dropna()
         
         if len(signal_noisy_numeric) == 0:
-            await update.message.reply_text('❌ Не удалось прочитать данные из файла')
+            await update.message.reply_text('Не удалось прочитать данные из файла')
             return
 
         # Подготовка сигнала
